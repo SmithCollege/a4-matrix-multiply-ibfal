@@ -23,32 +23,34 @@ int main() {
 
   for (int i = 0; i < size; i++) {
     for (int j = 0; j < size; j++) {
-     x[i * size + j] = 1; // x[i][j]
-     y[i * size + j] = 1;
+     x[i * size + j] = 1.0; // x[i][j]
+     y[i * size + j] = 1.0;
     }
   }
+//to test the array values
+//for (int i = 0; i < size; i++) {
+//	printf("\n");
+//      for (int j = 0; j < size; j++) {
+//       printf("%f  ", x[i * size + j]);
+//      }
+//    }
+//    printf("\n");
+//for (int i = 0; i < size; i++) {
+//	printf("\n");
+//      for (int j = 0; j < size; j++) {
+//       printf("%f  ", y[i * size + j]);
+//      }
+//    }
+    
+//printf("\n");
+//printf("\n");	
 
-for (int i = 0; i < size; i++) {
-	printf("\n");
-      for (int j = 0; j < size; j++) {
-       printf("%d  ", x[i * size + j]);
-      }
-    }
-    printf("\n");
-for (int i = 0; i < size; i++) {
-printf("\n");
-      for (int j = 0; j < size; j++) {
-       printf("%d  ", y[i * size + j]);
-      }
-    }
-printf("\n");
-printf("\n");	
   MatrixMulonHost(x, y, z, size);
 
-  for (int i = 0; i < size; i++) {
+for (int i = 0; i < size; i++) {
   printf("\n");
       for (int j = 0; j < size; j++) {
-       printf("%d  ", z[i * size + j]);
+       printf("%f  ", z[i * size + j]);
       }
     }
 printf("\n");
@@ -56,7 +58,7 @@ printf("\n");
   for (int i = 0; i < size; i++) {
     for (int j = 0; j < size; j++) {
       if (z[i * size + j] != size) {
-        printf("Error at z[%d][%d]: %f\n", i, j, z[i * size + j]);
+        printf("Error at z[%f][%f]: %f\n", i, j, z[i * size + j]);
       }
     }
   }
