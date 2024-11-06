@@ -28,7 +28,7 @@ void gpu_blas( double* M,  double* N,  double* P, int width){
 }
  
  int main(){
-     int width = 100000;
+     int width = 90;
      double *x,*y,*z, *dx, *dy, *dz;
  
      dx = (double *)malloc(sizeof(double) * width * width);
