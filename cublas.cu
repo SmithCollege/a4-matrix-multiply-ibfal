@@ -1,11 +1,20 @@
 #include <iostream>
 #include <math.h>
 #include <sys/time.h>
-#include <cublas_v2.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include "cublas_v2.h"
  
-#define TILE_WIDTH 2
+#define TILE_WIDTH 5
+
+double get_clock() {
+  struct timeval tv; int ok;
+  ok = gettimeofday(&tv, (void *) 0);
+  if (ok<0) { printf("gettimeofday error"); }
+  return (tv.tv_sec * 1.0 + tv.tv_usec * 1.0E-6);
+}
  
- __global__ void gpu_blas( double* M,  double* N,  double* P, int width){
+void gpu_blas( double* M,  double* N,  double* P, int width){
 	const double a = 1;
 	const double b = 0;
 	const double *A = &a;
@@ -19,7 +28,7 @@
 }
  
  int main(){
-     int width = TILE_WIDTH*2;
+     int width = 100000;
      double *x,*y,*z, *dx, *dy, *dz;
  
      dx = (double *)malloc(sizeof(double) * width * width);
@@ -39,30 +48,24 @@
  
     cudaMemcpy(x, dx, sizeof(double) * width * width, cudaMemcpyHostToDevice);
     cudaMemcpy(y,dy, sizeof(double) * width * width, cudaMemcpyHostToDevice);
-
-
-    dim3 dimGrid(ceil((1.0*width)/TILE_WIDTH), ceil((1.0*width)/TILE_WIDTH),1);
-    dim3 dimBlock(TILE_WIDTH, TILE_WIDTH, 1);
     cudaDeviceSynchronize();
 
-    gpu_blas<<<dimGrid, dimBlock>>>(x, y, z, width);
-
-        cudaMemcpy(dz,z, sizeof(double) * width * width, cudaMemcpyDeviceToHost);
-
-          for (int i = 0; i < width; i++) {
-                printf("\n");
-            for (int j = 0; j < width; j++) {
-              printf("%f ", z[i * width + j]);
-            }
-          }
-
-        printf("\n");
-          for (int i = 0; i < width; i++) {
-            for (int j = 0; j < width; j++) {
-              if (z[i * width + j] != width) {
-                printf("Error at z[%d][%d]: %f\n", i, j, z[i * width + j]);
+	double t0 = get_clock();
+    gpu_blas(x, y, z, width);
+	double t1 = get_clock();
+	
+    cudaMemcpy(dz,z, sizeof(double) * width * width, cudaMemcpyDeviceToHost);
+          
+	printf("\n");
+	printf("Time: %f ns\n", (1000000000.0*(t1-t0)));
+    printf("\n");
+    
+    for (int i = 0; i < width; i++) {       
+    	for (int j = 0; j < width; j++) {
+        	if (z[i * width + j] != width) {
+            	 printf("Error at z[%d][%d]: %f\n", i, j, z[i * width + j]);
               }
             }
           }
-          return 0;
+    return 0;
 }
